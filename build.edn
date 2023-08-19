@@ -1,0 +1,4 @@
+{:main beta.core
+ :output-to "target/main.js"
+ :output-dir "target"
+ :language-out :es5}

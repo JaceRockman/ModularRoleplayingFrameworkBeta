@@ -1,0 +1,4 @@
+{:paths ["src"]
+
+ :deps {io.vouch/krell {:mvn/version "0.5.4"}
+        reagent/reagent {:mvn/version "1.2.0"}}}

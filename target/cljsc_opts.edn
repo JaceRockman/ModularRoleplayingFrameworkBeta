@@ -1,0 +1,1 @@
+{:output-dir "target", :process-shim false, :target-fn krell.gen/krell-main-js, :target :bundle, :main beta.core, :output-to "target/main.js", :language-out :es5, :aot-cache true}

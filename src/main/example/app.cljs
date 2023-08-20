@@ -1,13 +1,16 @@
 (ns example.app
-  (:require [example.widgets :refer [button]]
-            [expo.root :as expo-root]
-            [data.app-state :as app]
-            [datascript.core :as ds]
-            ["expo-status-bar" :refer [StatusBar]]
-            ["react-native" :as rn]
-            [reagent.core :as r]
-            ["@react-navigation/native" :as rnn]
-            ["@react-navigation/native-stack" :as rnn-stack]))
+  (:require
+   [example.widgets :refer [button]]
+   [expo.root :as expo-root]
+   [data.app-state :as app]
+   [datascript.core :as ds]
+   ["expo-status-bar" :refer [StatusBar]]
+   ["react-native" :as rn]
+   [reagent.core :as r]
+   ["@react-navigation/native" :as rnn]
+   ["@react-navigation/native-stack" :as rnn-stack])
+  (:require-macros
+   [example.app :refer [profile]]))
 
 (defonce shadow-splash (js/require "../assets/shadow-cljs.png"))
 (defonce cljs-splash (js/require "../assets/cljs.png"))
@@ -35,8 +38,8 @@
 
 
 (defn home [db ^js props]
-  (r/with-let [[_ counter-val] (get-counter-val db)
-               tap-enabled? (get-counter-enabled db)]
+  (let [[_ counter-val] (get-counter-val db)
+        tap-enabled? (get-counter-enabled db)]
     [:> rn/View {:style {:flex 1
                          :padding-vertical 50
                          :justify-content :space-between
@@ -124,6 +127,17 @@
     :home (r/as-element [home db {}])
     :about (r/as-element [about db {}])))
 
+(defn render
+  ([] (render @app/conn))
+  ([db]
+   (profile "render"
+            (expo-root/render-root (r/as-element [my-root @app/conn])))))
+
+;; re-render on every DB change
+(ds/listen! app/conn :render
+            (fn [tx-report]
+              (render (:db-after tx-report))))
+
 (defn start
   {:dev/after-load true}
   []
@@ -131,4 +145,4 @@
 
 (defn init []
   (app/init-dev-db)
-  (start))
+  (render))

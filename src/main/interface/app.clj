@@ -1,4 +1,4 @@
-(ns example.app)
+(ns interface.app)
 
 (defmacro profile [k & body]
   `(let [k# ~k]

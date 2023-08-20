@@ -1,10 +1,10 @@
-(ns example.widgets
+(ns interface.widgets
   (:require ["react-native" :as rn]))
 
 
 (defn button [{:keys [style text-style on-press
-                       disabled? disabled-style disabled-text-style]
-                :or {on-press #()}} text]
+                      disabled? disabled-style disabled-text-style]
+               :or {on-press #()}} text]
   [:> rn/Pressable {:style (cond-> {:font-weight      :bold
                                     :font-size        18
                                     :padding          6

@@ -1,6 +1,6 @@
-(ns example.app
+(ns interface.app
   (:require
-   [example.widgets :refer [button]]
+   [interface.widgets :refer [button]]
    [expo.root :as expo-root]
    [data.app-state :as app]
    [datascript.core :as ds]
@@ -10,7 +10,7 @@
    ["@react-navigation/native" :as rnn]
    ["@react-navigation/native-stack" :as rnn-stack])
   (:require-macros
-   [example.app :refer [profile]]))
+   [interface.app :refer [profile]]))
 
 (defonce shadow-splash (js/require "../assets/shadow-cljs.png"))
 (defonce cljs-splash (js/require "../assets/cljs.png"))

@@ -1,6 +1,5 @@
 (ns data.app-state
   (:require [datascript.core :as ds]
-            [data.schema :as schema]
             [data.domains :as domains]
             [data.creatures :as creatures]))
 

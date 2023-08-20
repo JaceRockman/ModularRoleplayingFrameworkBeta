@@ -55,7 +55,8 @@
                :style {:background-color :blue}}
        "Tap me, I'll count"]]
      [:> rn/View {:style {:align-items :center}}
-      [button {:on-press #(ds/transact! app/conn [[:db/add 1 :navigator/val :about]])}
+      [button {:on-press (fn []
+                           (-> props .-navigation (.navigate "About")))}
        "Tap me, I'll navigate"]]
      [:> rn/View
       [:> rn/View {:style {:flex-direction :row
@@ -102,10 +103,10 @@
 (defn root [db]
   ;; The save and restore of the navigation root state is for development time bliss
   (r/with-let [!root-state (ffirst (ds/q '[:find ?navigation-root
-                                           :where ["navigator" :navigation/root ?navigation-root]]
+                                           :where [1 :navigator/val ?navigation-root]]
                                          db))
                save-root-state! (fn [^js state]
-                                  (ds/transact! app/conn [[:db/add :navigator :navigation/root state]]))
+                                  (ds/transact! app/conn [[:db/add 1 :navigator/val state]]))
                add-listener! (fn [^js navigation-ref]
                                (when navigation-ref
                                  (.addListener navigation-ref "state" save-root-state!)))]
@@ -119,6 +120,7 @@
                         :component (fn [props] (r/as-element [about db props]))
                         :options {:title "About"}}]]]))
 
+;; This would be a simpler way to do routing for the app
 (defn my-root [db]
   (println (get-counter-val db))
   (case (ffirst (ds/q '[:find ?navigator
@@ -128,20 +130,16 @@
     :about (r/as-element [about db {}])))
 
 (defn render
+  {:dev/after-load true}
   ([] (render @app/conn))
   ([db]
    (profile "render"
-            (expo-root/render-root (r/as-element [my-root @app/conn])))))
+            (expo-root/render-root (r/as-element [root @app/conn])))))
 
 ;; re-render on every DB change
 (ds/listen! app/conn :render
             (fn [tx-report]
               (render (:db-after tx-report))))
-
-(defn start
-  {:dev/after-load true}
-  []
-  (expo-root/render-root (r/as-element [my-root @app/conn])))
 
 (defn init []
   (app/init-dev-db)

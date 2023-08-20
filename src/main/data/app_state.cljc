@@ -10,9 +10,9 @@
   []
   (let [_ (ds/transact! conn creatures/creature-races)
         _ (ds/transact! conn domains/default-domains)
-        _ (ds/transact! conn [[:db/add "navigator" :navigator/val :home]
-                              [:db/add "counter" :counter/val 0]
-                              [:db/add "counter" :counter/enabled true]])
+        _ (ds/transact! conn [[:db/add 1 :navigator/val :home]
+                              [:db/add 2 :counter/val 0]
+                              [:db/add 2 :counter/enabled true]])
         db (:db-after (ds/transact! conn creatures/creature-races))
         init-domain-entities (flatten (ds/q '[:find ?e
                                               :where [?e :domain/id]]

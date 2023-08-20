@@ -21,21 +21,22 @@
                db)))
 
 (defn get-counter-enabled
-  []
+  [db]
   (ffirst (ds/q '[:find ?counter
                   :where [?e :counter/enabled ?counter]]
-                @app/conn)))
+                db)))
 
 (defn inc-counter
-  []
-  (let [[eid val] (get-counter-val @app/conn)]
+  [db]
+  (let [[eid val] (get-counter-val db)]
     (ds/transact! app/conn [[:db/add eid :counter/val (inc val)]])))
 
 ;; (inc-counter 8 1)
 
-(defn home [^js props]
-  (r/with-let [[_ counter-val] (get-counter-val @app/conn)
-               tap-enabled? (get-counter-enabled)]
+
+(defn home [db ^js props]
+  (r/with-let [[_ counter-val] (get-counter-val db)
+               tap-enabled? (get-counter-enabled db)]
     [:> rn/View {:style {:flex 1
                          :padding-vertical 50
                          :justify-content :space-between
@@ -46,12 +47,12 @@
                            :font-size     72
                            :color         :blue
                            :margin-bottom 20}} counter-val]
-      [button {:on-press #(inc-counter)
+      [button {:on-press #(inc-counter db)
                :disabled? (not tap-enabled?)
                :style {:background-color :blue}}
        "Tap me, I'll count"]]
      [:> rn/View {:style {:align-items :center}}
-      [button {:on-press #(ds/transact! app/conn [[:db/add "navigator" :navigator/val :about]])}
+      [button {:on-press #(ds/transact! app/conn [[:db/add 1 :navigator/val :about]])}
        "Tap me, I'll navigate"]]
      [:> rn/View
       [:> rn/View {:style {:flex-direction :row
@@ -70,8 +71,8 @@
      [:> StatusBar {:style "auto"}]]))
 
 (defn- about
-  []
-  (r/with-let [[_ counter-val] (get-counter-val @app/conn)]
+  [db]
+  (r/with-let [[_ counter-val] (get-counter-val db)]
     [:> rn/View {:style {:flex 1
                          :padding-vertical 50
                          :padding-horizontal 20
@@ -95,13 +96,13 @@
        "Built with React Native, Expo, Reagent, re-frame, and React Navigation"]]
      [:> StatusBar {:style "auto"}]]))
 
-(defn root []
+(defn root [db]
   ;; The save and restore of the navigation root state is for development time bliss
   (r/with-let [!root-state (ffirst (ds/q '[:find ?navigation-root
-                                           :where [?e :navigation/root ?navigation-root]]
-                                         @app/conn))
+                                           :where ["navigator" :navigation/root ?navigation-root]]
+                                         db))
                save-root-state! (fn [^js state]
-                                  (ds/transact! app/conn [[:db/add "navigation-root" :navigation/root state]]))
+                                  (ds/transact! app/conn [[:db/add :navigator :navigation/root state]]))
                add-listener! (fn [^js navigation-ref]
                                (when navigation-ref
                                  (.addListener navigation-ref "state" save-root-state!)))]
@@ -109,16 +110,24 @@
                                  :initialState (when !root-state (-> !root-state .-data .-state))}
      [:> Stack.Navigator
       [:> Stack.Screen {:name "Home"
-                        :component (fn [props] (r/as-element [home props]))
+                        :component (fn [props] (r/as-element [home db props]))
                         :options {:title "Example App"}}]
       [:> Stack.Screen {:name "About"
-                        :component (fn [props] (r/as-element [about props]))
+                        :component (fn [props] (r/as-element [about db props]))
                         :options {:title "About"}}]]]))
+
+(defn my-root [db]
+  (println (get-counter-val db))
+  (case (ffirst (ds/q '[:find ?navigator
+                        :where [?eid :navigator/val ?navigator]]
+                      db))
+    :home (r/as-element [home db {}])
+    :about (r/as-element [about db {}])))
 
 (defn start
   {:dev/after-load true}
   []
-  (expo-root/render-root (r/as-element [root])))
+  (expo-root/render-root (r/as-element [my-root @app/conn])))
 
 (defn init []
   (app/init-dev-db)

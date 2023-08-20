@@ -1,0 +1,16 @@
+{:paths ["src/main"]
+
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/clojurescript {:mvn/version "1.11.60"}
+        ;; org.clojure/tools.deps {:mvn/version "0.16.1264"}
+        thheller/shadow-cljs {:mvn/version "2.25.2"}
+        com.google.javascript/closure-compiler-unshaded {:mvn/version "v20230411"}
+        party.donut/system {:mvn/version "0.0.211"}
+        ;; com.datomic/dev-local {:mvn/version "1.0.243"}
+        io.pedestal/pedestal.log {:mvn/version "0.5.11-beta-1"}
+        ;; io.pedestal/pedestal.service {:mvn/version "0.5.11-beta-1"}
+        ;; io.pedestal/pedestal.jetty {:mvn/version "0.5.11-beta-1"}
+        ;; io.pedestal/pedestal.interceptor {:mvn/version "0.5.11-beta-1"}
+        ;; io.pedestal/pedestal.route {:mvn/version "0.5.11-beta-1"}
+        datascript/datascript {:mvn/version "1.4.2"}
+        reagent/reagent {:mvn/version "1.2.0"}}}
